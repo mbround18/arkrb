@@ -1,4 +1,4 @@
-module ArkRb
+module Arkrb
   module Error
     class CustomError < RuntimeError
     end

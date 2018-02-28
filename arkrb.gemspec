@@ -4,7 +4,7 @@ $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'arkrb/version'
 
 Gem::Specification.new do |spec|
-  spec.name          = "arkrb"
+  spec.name          = 'arkrb'
   spec.version       = Arkrb::VERSION
   spec.authors = ['Michael Bruno']
   spec.email = ['michael.bruno1337@gmail.com']

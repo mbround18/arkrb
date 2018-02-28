@@ -1,16 +1,16 @@
-require "arkrb/version"
+require 'arkrb/version'
 
 module Arkrb
 
-  # @return [ArkRb::Install]
+  # @return [Arkrb::Install]
   def self.install
-    ArkRb::Install.new
+    Arkrb::Install.new
   end
 
   # @return [String]
   def self.executable
     arkmanager_exec = find_executable('arkmanager')
-    raise ArkRb::Error::ArkManagerExecutableNotFound, 'We could not find the ark_rb binary! Please install it by running Arkrb.install.server_tools or executing the command `ark_rb install tools``' if arkmanager_exec.nil?
+    raise Arkrb::Error::ArkManagerExecutableNotFound, 'We could not find the ark_rb binary! Please install it by running Arkrb.install.server_tools or executing the command `ark_rb install tools``' if arkmanager_exec.nil?
     arkmanager_exec
   end
 

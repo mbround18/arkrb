@@ -93,7 +93,7 @@ module Arkrb
     private
 
     def arkmanager_exec(command)
-      ArkRb.execute(command, instance_name, false)
+      Arkrb.execute(command, instance_name, false)
     end
 
   end

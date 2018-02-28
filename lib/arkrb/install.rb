@@ -17,7 +17,7 @@ module Arkrb
       `#{CURL_EXEC} -sL http://git.io/vtf5N > #{server_tools_install_sh_path}`
       file_md5 = Digest::MD5.hexdigest File.read(server_tools_install_sh_path)
 
-      raise Arkrb::Error::InstallScriptMD5Changed, "Uhh oh!!! #{file_md5} did not match #{ARK_SERVER_TOOLS_MD5}; Please report this issue at https://github.com/mbround18/arkrb" unless file_md5.eql? ARK_SERVER_TOOLS_MD5
+      raise Arkrb::Error::InstallScriptMD5Changed, "Uhh oh!!! #{file_md5} did not match #{ARK_SERVER_TOOLS_MD5}; Please report this issue at https://github.com/mbround18/Arkrb" unless file_md5.eql? ARK_SERVER_TOOLS_MD5
 
       `#{BASH_EXEC} #{server_tools_install_sh_path} --me --perform-user-install`
 
@@ -31,7 +31,7 @@ module Arkrb
 
     def ark(instance = 'main')
       Arkrb::Server.new(instance).install
-      # ArkRb.execute('install', instance, false)
+      # Arkrb.execute('install', instance, false)
     end
 
     def ark_installed?(instance = 'main')

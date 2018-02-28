@@ -22,9 +22,9 @@ module Arkrb
       unless name.nil?
         case name.to_sym
           when :arkmanager, :ark_manager, :tools
-            ArkRb.install.server_tools
+            Arkrb.install.server_tools
           when :ark
-            ArkRb.install.ark(name)
+            Arkrb.install.ark(name)
           else
             # do nothing
         end
@@ -36,7 +36,7 @@ module Arkrb
 
     # @return [Boolean]
     def ark_installed? instance
-      ArkRb.install.ark_installed?(instance)
+      Arkrb.install.ark_installed?(instance)
     end
 
     def print_status(item, status, how_to)
