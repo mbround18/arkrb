@@ -1,4 +1,8 @@
 require 'arkrb/version'
+require 'arkrb/constants'
+require 'arkrb/error_parsing'
+require 'arkrb/output_parsing'
+require 'open3'
 
 module Arkrb
 
@@ -8,22 +12,32 @@ module Arkrb
   end
 
   # @return [String]
-  def self.executable
-    arkmanager_exec = find_executable('arkmanager')
+  def self.executable(path = "#{USER_HOME}/bin")
+    arkmanager_exec = find_executable('arkmanager', path)
     raise Arkrb::Error::ArkManagerExecutableNotFound, 'We could not find the ark_rb binary! Please install it by running Arkrb.install.server_tools or executing the command `ark_rb install tools``' if arkmanager_exec.nil?
     arkmanager_exec
   end
 
   # @return [Integer, String]
-  def self.execute(command, instance = 'main', headless = false, std_out = '/dev/null', std_error = '/dev/null', detach = true)
-    exec_this = format('%s %s @%s', executable, command, instance)
-    if headless
-      pid = spawn(exec_this, out: std_out, err: std_error)
-      Process.detach(pid) if detach
-      pid
+  def self.execute(command, command_opts = '', instance = 'main', sanitize = false)
+    exec_this = format('%s %s %s @%s', executable, command.to_s.tr('_', ''), command_opts, instance)
+    stdin, stdout, stderr = Open3.popen3(exec_this)
+    output = stdout.read.chomp
+    errors = stderr.read.chomp
+    errors += 'Your ARK server exec could not be found.' if output =~ /#{'ARK server exec could not be found'}/im
+
+    Arkrb::ErrorParsing.new.sanitize!(command, errors) unless errors.strip.empty?
+    # todo: Remove the sanatize equals true line below.
+    sanitize = true
+
+    if sanitize
+      output_parsing = Arkrb::OutputParsing.new
+      output_parsing.sanitize!(command, output)
     else
-      system(exec_this)
+      puts output
+      puts errors
     end
+
   end
 
 end

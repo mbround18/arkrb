@@ -1,6 +1,10 @@
 module Arkrb
   module Error
+
     class CustomError < RuntimeError
+    end
+
+    class UnknownError < CustomError
     end
 
     class ExecutableAlreadyExists < CustomError
@@ -16,6 +20,15 @@ module Arkrb
     end
 
     class InstallScriptMD5Changed < CustomError
+    end
+
+    class SteamCMDError < CustomError
+    end
+
+    class ArkExecutableNotFound < CustomError
+    end
+
+    class ServerAlreadyRunning < CustomError
     end
 
   end

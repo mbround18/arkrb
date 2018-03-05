@@ -1,11 +1,8 @@
 require 'mkmf'
 require 'digest'
 require 'arkrb/server'
-require 'arkrb/ark_server_tools_md5'
+require 'arkrb/constants'
 
-BASH_EXEC = find_executable 'bash' unless defined? BASH_EXEC
-CURL_EXEC = find_executable 'curl' unless defined? CURL_EXEC
-USER_HOME = Dir.home unless defined? USER_HOME
 module Arkrb
   class Install
 
@@ -17,25 +14,20 @@ module Arkrb
       `#{CURL_EXEC} -sL http://git.io/vtf5N > #{server_tools_install_sh_path}`
       file_md5 = Digest::MD5.hexdigest File.read(server_tools_install_sh_path)
 
-      raise Arkrb::Error::InstallScriptMD5Changed, "Uhh oh!!! #{file_md5} did not match #{ARK_SERVER_TOOLS_MD5}; Please report this issue at https://github.com/mbround18/Arkrb" unless file_md5.eql? ARK_SERVER_TOOLS_MD5
+      raise Arkrb::Error::InstallScriptMD5Changed, "Uhh oh!!! #{file_md5} did not match #{Arkrb::ARK_SERVER_TOOLS_MD5}; Please report this issue at https://github.com/mbround18/Arkrb" unless file_md5.eql? Arkrb::ARK_SERVER_TOOLS_MD5
 
       `#{BASH_EXEC} #{server_tools_install_sh_path} --me --perform-user-install`
 
-      unless find_executable('arkmanager', "#{USER_HOME}/bin")
-        File.open("#{USER_HOME}/.bashrc", 'a') do |file|
-          file.write "export PATH=$PATH:#{File.expand_path(USER_HOME + '/bin')}"
+      unless find_executable('arkmanager', "#{Arkrb::USER_HOME}/bin")
+        File.open("#{Arkrb::USER_HOME}/.bashrc", 'a') do |file|
+          file.write "export PATH=$PATH:#{File.expand_path(Arkrb::USER_HOME + '/bin')}"
         end
-        puts 'arkmanager was successfully added to your path' if find_executable('arkmanager', "#{USER_HOME}/bin")
+        puts 'arkmanager was successfully added to your path' if find_executable('arkmanager', "#{Arkrb::USER_HOME}/bin")
       end
     end
 
-    def ark(instance = 'main')
-      Arkrb::Server.new(instance).install
-      # Arkrb.execute('install', instance, false)
-    end
-
-    def ark_installed?(instance = 'main')
-      false
+    def ark(instance = 'main', sanitize_output = false)
+      Arkrb::Server.new(instance, sanitize_output).install
     end
 
   end
