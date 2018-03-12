@@ -2,15 +2,10 @@ module Arkrb
   class OutputParsing
 
     def sanitize!(command, output)
-      case command
-        when :install
-          install(output)
-        when :start
-          start(output)
-        when :stop
-          stop(output)
-        else
-          # Do nothing
+      if public_methods(false).include?(command.to_sym)
+        method(command.to_sym).call(output)
+      else
+        raise Arkrb::Error::SanitizationUnsupportedForThisMethod, "\n#{output}"
       end
     end
 
@@ -29,7 +24,7 @@ module Arkrb
 
     # @return [True, Exception]
     def start(output)
-      if output.strip.empty?
+      if output =~ /#{'the server is now running'}/im
         true
       else
         if output =~ /#{'server already running'}/im
@@ -42,58 +37,130 @@ module Arkrb
 
     # @return [True, Exception]
     def stop(output)
-      puts output
+      if output =~ /#{'The server has been stopped'}/im
+        true
+      else
+        if output =~ /#{'The server is already stopped'}/im
+          raise Arkrb::Error::ServerAlreadyStopped, output
+        else
+          raise_unknown_error(__method__.to_sym, output)
+        end
+      end
     end
 
     # @return [True, Exception]
-    # def restart(output)
-    #   arkmanager_exec :restart
-    # end
+    def restart(output)
+      if output =~ /#{'server has been stopped'}/im &&
+          output =~ /#{'the server is now running'}/im
+        true
+      else
+        raise_unknown_error(__method__.to_sym, output)
+      end
+    end
+
+    def status(output)
+      status_items = {}
+      status = output.gsub(/\e\[([;\d]+)?m/, '')
+      if status =~ /Server running/im
+        status = status.split("\n").map {|s| s.strip }
+        status.shift
+        status.each do |item|
+          item_info = item.split(':', 2)
+          status_items[item_info.first.gsub('Server', '').strip.downcase.tr(' ', '_').to_sym] = item_info[1].strip
+        end
+        status_items[:arkservers_link] = status_items.delete(:arks_link)
+        status_items
+      else
+        raise_unknown_error(__method__.to_sym, output)
+      end
+    end
 
     # @return [True, Exception]
-    # def update(output)
-    #   arkmanager_exec :update
-    # end
+    def update(output)
+      if output =~ /#{'already up to date '}/im || output =~ /#{'updated'}/im
+      else
+        raise_unknown_error(__method__.to_sym, output)
+      end
+    end
+
 
     # @return [True, Exception]
-    # def backup(output)
-    #   arkmanager_exec :backup
-    # end
+    def backup(output)
+      if output =~ /Created Backup/im
+        console_response = output.split("\n").map {|x| x.gsub(/\e\[([;\d]+)?m/, '').strip}
+        dir_path = console_response.find {|x| x =~ /Saved arks directory is/im}.split('directory is').last.strip
+        file_name = console_response.find {|x| x =~ /Created Backup/im}.split(':').last.strip
+        {
+            status: 'success',
+            path: File.join(dir_path, file_name)
+        }
+      else
+        raise_unknown_error(__method__.to_sym, output)
+      end
+    end
 
     # @return [True, Exception]
-    # def save_world(output)
-    #   arkmanager_exec :save_world
-    # end
+    def save_world(output)
+      if output =~ /world saved/im
+        true
+      else
+        raise_unknown_error(__method__.to_sym, output)
+      end
+    end
 
     # @return [True, Exception]
-    # def enable_mod(output)
-    #   arkmanager_exec(:enable_mod, mod_id)
-    # end
+    def enable_mod(output)
+      if output =~ /enable mod/im
+        true
+      else
+        raise_unknown_error(__method__.to_sym, output)
+      end
+    end
 
     # @return [True, Exception]
-    # def disable_mod(output)
-    #   arkmanager_exec(:disable_mod, mod_id)
-    # end
+    def disable_mod(output)
+      if output =~ /disablemod/im
+        true
+      else
+        raise_unknown_error(__method__.to_sym, output)
+      end
+    end
 
     # @return [True, Exception]
-    # def install_mod(output)
-    #   arkmanager_exec(:install_mod, mod_id)
-    # end
+    def install_mod(output)
+      if output =~ /mod [0-9]+ installed/im
+        true
+      else
+        raise_unknown_error(__method__.to_sym, output.gsub("\r", "\n"))
+      end
+    end
 
     # @return [True, Exception]
-    # def uninstall_mod(output)
-    #   arkmanager_exec(:uninstall_mod, mod_id)
-    # end
+    def uninstall_mod(output)
+      if output =~ /uninstallmod/im
+        true
+      else
+        raise_unknown_error(__method__.to_sym, output)
+      end
+    end
 
     # @return [True, Exception]
-    # def reinstall_mod(output)
-    #   arkmanager_exec(:reinstall_mod, mod_id)
-    # end
+    def reinstall_mod(output)
+      if output =~ /mod [0-9]+ installed/im
+        true
+      else
+        raise_unknown_error(__method__.to_sym, output.gsub("\r", "\n"))
+      end
+    end
 
     # @return [True, Exception]
-    # def broadcast(output)
-    #   arkmanager_exec(:broadcast, message)
-    # end
+    def broadcast(output)
+      if output =~ /command processed/im
+        true
+      else
+        raise_unknown_error(__method__.to_sym, output.gsub("\r", "\n"))
+      end
+    end
 
     # @return [Object]
     # def rcon_cmd(output)
@@ -107,14 +174,10 @@ module Arkrb
 
     # @return [Boolean]
     # def mod_updates_available?(output)
-    #   arkmanager_exec :check_mod_update
+    #   output
     # end
 
     private
-
-    # def filter_known_errors(output)
-    #   yield(output)
-    # end
 
     def raise_unknown_error(command, output)
       error_message = format("An unknown error has occurred while attempting to run command %s\n%s", command, output)

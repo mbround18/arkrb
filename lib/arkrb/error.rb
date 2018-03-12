@@ -31,6 +31,21 @@ module Arkrb
     class ServerAlreadyRunning < CustomError
     end
 
+    class ServerAlreadyStopped < CustomError
+    end
+
+    class SanitizationUnsupportedForThisMethod < CustomError
+    end
+
+    class ModIDNotFound < CustomError
+    end
+
+    class ModDoesNotExist < CustomError
+    end
+
+    class ModAlreadyExists < CustomError
+    end
+
   end
 
 end

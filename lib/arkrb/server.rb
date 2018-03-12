@@ -1,16 +1,19 @@
 require 'mkmf'
+require 'oga'
+require 'open-uri'
 require 'arkrb'
 require 'arkrb/error'
-
+require 'arkrb/server/mods'
 module Arkrb
   class Server
 
     def initialize(instance_name, sanitize_output = true)
       @instance_name = instance_name
       @sanitize_output = sanitize_output
+      mod_list
     end
 
-    attr_reader :instance_name
+    attr_reader :instance_name, :mod_list
 
     def install
       arkmanager_exec :install
@@ -29,6 +32,10 @@ module Arkrb
     # @return [True, Exception]
     def restart!
       arkmanager_exec :restart
+    end
+
+    def status!
+      arkmanager_exec :status
     end
 
     # @return [True, Exception]
@@ -91,6 +98,10 @@ module Arkrb
       arkmanager_exec :check_mod_update
     end
 
+    def mod_list
+      @mod_list ||=  Arkrb::Mods.new
+    end
+
     private
 
     def arkmanager_exec(command, command_opts = '')
@@ -99,3 +110,24 @@ module Arkrb
 
   end
 end
+
+# server = Arkrb::Server.new('main')
+# server.mod_list.add(731604991)
+#
+# pp server
+#
+# pp server.mod_list.to_h
+#
+#
+#
+#     mod_list = Arkrb::Mods.new
+#
+# pp mod_list
+# mod_a = 731604991
+# mod_b = 812655342
+#
+# mod_list.add(731604991)
+# mod_list.add(812655342)
+# pp mod_list.to_h
+# # mod_list.add(731604991)
+# # pp mod_list.find_by_id(mod_a).to_h

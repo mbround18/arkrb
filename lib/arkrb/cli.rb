@@ -50,6 +50,12 @@ module Arkrb
       ark_server(options[:instance]).restart!
     end
 
+    desc 'status', 'Displays the status of the server'
+
+    def status
+      ark_server(options[:instance]).status!
+    end
+
     desc 'update', 'Updates the ark server'
 
     def update
@@ -64,7 +70,7 @@ module Arkrb
 
     desc 'saveworld', 'Saves the ark world'
 
-    def save_world!
+    def saveworld
       ark_server(options[:instance]).save_world!
     end
 
@@ -89,7 +95,7 @@ module Arkrb
     desc 'uninstallmod MOD_ID', 'Uninstalls the mod via mod ID'
 
     def uninstallmod(mod_id)
-      ark_server(options[:instance]).reinstall_mod mod_id
+      ark_server(options[:instance]).uninstall_mod mod_id
     end
 
     desc 'reinstallmod MOD_ID', 'Reinstalls the mod via mod ID'

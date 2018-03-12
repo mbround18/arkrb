@@ -27,12 +27,13 @@ module Arkrb
     errors += 'Your ARK server exec could not be found.' if output =~ /#{'ARK server exec could not be found'}/im
 
     Arkrb::ErrorParsing.new.sanitize!(command, errors) unless errors.strip.empty?
+
     # todo: Remove the sanatize equals true line below.
     sanitize = true
 
     if sanitize
       output_parsing = Arkrb::OutputParsing.new
-      output_parsing.sanitize!(command, output)
+      pp output_parsing.sanitize!(command, output)
     else
       puts output
       puts errors
