@@ -40,8 +40,12 @@ module Arkrb
     end
 
     # @return [True, Exception]
-    def update!
-      arkmanager_exec :update
+    def update!(update_mods = false)
+      if update_mods
+        arkmanager_exec :update, '--update-mods'
+      else
+        arkmanager_exec :update
+      end
     end
 
     # @return [True, Exception]

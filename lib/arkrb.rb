@@ -21,6 +21,7 @@ module Arkrb
   # @return [Integer, String]
   def self.execute(command, command_opts = '', instance = 'main', sanitize = false)
     exec_this = format('%s %s %s @%s', executable, command.to_s.tr('_', ''), command_opts, instance)
+    pp exec_this
     stdin, stdout, stderr = Open3.popen3(exec_this)
     output = stdout.read.chomp
     errors = stderr.read.chomp

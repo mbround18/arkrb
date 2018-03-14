@@ -84,7 +84,9 @@ module Arkrb
 
     # @return [True, Exception]
     def update(output)
-      if output =~ /#{'already up to date '}/im || output =~ /#{'updated'}/im
+      if output =~ /#{'already up to date'}/im || output =~ /#{'updated'}/im
+        # output
+        true
       else
         raise_unknown_error(__method__.to_sym, output)
       end
