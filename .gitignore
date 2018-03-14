@@ -6,7 +6,7 @@
 /pkg/
 /spec/reports/
 /tmp/
-
+*.log
 
 
 # Created by https://www.gitignore.io/api/ruby,linux,rubymine+all

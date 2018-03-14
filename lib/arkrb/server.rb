@@ -4,6 +4,7 @@ require 'open-uri'
 require 'arkrb'
 require 'arkrb/error'
 require 'arkrb/server/mods'
+require 'arkrb/server/player'
 module Arkrb
   class Server
 
@@ -85,7 +86,34 @@ module Arkrb
 
     # @return [Object]
     def rcon_cmd(command)
-      arkmanager_exec(:rcon, command)
+      arkmanager_exec(:rconcmd, command.to_s)
+    end
+
+    def get_player_list
+      sanitize_filter = @sanitize_output
+      @sanitize_output = true
+      users = []
+      player_list = rcon_cmd('ListPlayers')
+                        .split("\n")
+                        .map {|m| m.delete('\\"').strip}
+                        .reject(&:empty?)
+      player_list.delete_if {|x| x =~ /Running command/im}
+      if player_list.count == 1 && player_list.first =~ /no/im
+        users << Player.new(player_list.first, player_list.first, player_list.first)
+      else
+        player_list.map! {|p| %i(name steam_id).zip(p.gsub!(/^[0-9]+. /im, '').split(', ')).to_h}
+        player_list.each do |u|
+          player_id = rcon_cmd("GetPlayerIDForSteamID #{u[:steam_id].to_i}")
+                          .split("\n")
+                          .delete_if {|x| x =~ /Running command/im}
+                          .map! {|x| x.delete('\\"').strip}
+                          .reject(&:empty?)
+                          .first.split('PlayerID: ').last
+          users << Player.new(u[:name], u[:steam_id], player_id)
+        end
+      end
+      @sanitize_output = sanitize_filter
+      users
     end
 
     # @return [Boolean]
@@ -99,7 +127,7 @@ module Arkrb
     end
 
     def mod_list
-      @mod_list ||=  Arkrb::Mods.new
+      @mod_list ||= Arkrb::Mods.new
     end
 
     private
@@ -110,8 +138,10 @@ module Arkrb
 
   end
 end
-
-# server = Arkrb::Server.new('main')
+server = Arkrb::Server.new('main')
+server.restart!
+pp server.status!
+# pp server.get_player_list
 # server.mod_list.add(731604991)
 #
 # pp server

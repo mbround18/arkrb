@@ -20,6 +20,18 @@ Or install it yourself as:
 
     $ gem install arkrb
 
+## Installation of Bleeding Edge
+
+Add this line to your application's Gemfile:
+
+```ruby
+gem 'arkrb', :git => 'https://github.com/mbround18/arkrb.git'
+```
+
+And then execute:
+
+    $ bundle
+
 ## Usage
 
 TODO: Write usage instructions here

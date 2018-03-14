@@ -46,6 +46,12 @@ module Arkrb
     class ModAlreadyExists < CustomError
     end
 
+    class PlayerNotFound < CustomError
+    end
+
+    class PlayerAlreadyExists < CustomError
+    end
+
   end
 
 end

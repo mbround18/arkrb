@@ -28,12 +28,9 @@ module Arkrb
 
     Arkrb::ErrorParsing.new.sanitize!(command, errors) unless errors.strip.empty?
 
-    # todo: Remove the sanatize equals true line below.
-    sanitize = true
-
     if sanitize
       output_parsing = Arkrb::OutputParsing.new
-      pp output_parsing.sanitize!(command, output)
+      output_parsing.sanitize!(command, output)
     else
       puts output
       puts errors

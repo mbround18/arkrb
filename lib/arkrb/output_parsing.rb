@@ -50,8 +50,7 @@ module Arkrb
 
     # @return [True, Exception]
     def restart(output)
-      if output =~ /#{'server has been stopped'}/im &&
-          output =~ /#{'the server is now running'}/im
+      if output =~ /#{'the server is now running'}/im
         true
       else
         raise_unknown_error(__method__.to_sym, output)
@@ -60,16 +59,24 @@ module Arkrb
 
     def status(output)
       status_items = {}
+      defaults = {
+          running: nil, pid: nil, listening: nil, name: nil,
+          players: nil, active_players: nil, online: nil,
+          arkservers_link: nil, build_id: nil, version: nil
+      }
+
       status = output.gsub(/\e\[([;\d]+)?m/, '')
       if status =~ /Server running/im
-        status = status.split("\n").map {|s| s.strip }
+        status = status.split("\n").map {|s| s.strip}
         status.shift
         status.each do |item|
           item_info = item.split(':', 2)
-          status_items[item_info.first.gsub('Server', '').strip.downcase.tr(' ', '_').to_sym] = item_info[1].strip
+          status_items[item_info.first.gsub('Server ', '').strip.downcase.tr(' ', '_').to_sym] = item_info[1].strip
         end
-        status_items[:arkservers_link] = status_items.delete(:arks_link)
-        status_items
+        status_items[:running] = (status_items.fetch(:running, 'no') =~ /yes/im) ? true : false
+        status_items[:listening] = (status_items.fetch(:listening, 'no') =~ /yes/im) ? true : false
+        status_items[:online] = (status_items.fetch(:online, 'no') =~ /yes/im) ? true : false
+        defaults.merge(status_items)
       else
         raise_unknown_error(__method__.to_sym, output)
       end
@@ -163,9 +170,9 @@ module Arkrb
     end
 
     # @return [Object]
-    # def rcon_cmd(output)
-    #   arkmanager_exec(:rcon, command)
-    # end
+    def rconcmd(output)
+      output
+    end
 
     # @return [Boolean]
     # def update_available?(output)
