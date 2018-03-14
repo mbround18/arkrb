@@ -18,7 +18,12 @@ module Arkrb
 
       `#{BASH_EXEC} #{server_tools_install_sh_path} --me --perform-user-install`
 
-      unless find_executable('arkmanager', "#{Arkrb::USER_HOME}/bin")
+      old_mkmf_log = MakeMakefile::Logging.instance_variable_get(:@logfile)
+      MakeMakefile::Logging.instance_variable_set(:@logfile, '/dev/null')
+      ark_manager_exec = find_executable0('arkmanager', "#{Arkrb::USER_HOME}/bin")
+      MakeMakefile::Logging.instance_variable_set(:@logfile, old_mkmf_log)
+
+      unless ark_manager_exec
         File.open("#{Arkrb::USER_HOME}/.bashrc", 'a') do |file|
           file.write "export PATH=$PATH:#{File.expand_path(Arkrb::USER_HOME + '/bin')}"
         end

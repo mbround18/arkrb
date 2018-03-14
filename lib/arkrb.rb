@@ -13,7 +13,10 @@ module Arkrb
 
   # @return [String]
   def self.executable(path = "#{USER_HOME}/bin")
-    arkmanager_exec = find_executable('arkmanager', path)
+    old_mkmf_log = MakeMakefile::Logging.instance_variable_get(:@logfile)
+    MakeMakefile::Logging.instance_variable_set(:@logfile, '/dev/null')
+    arkmanager_exec = find_executable0('arkmanager', path)
+    MakeMakefile::Logging.instance_variable_set(:@logfile, old_mkmf_log)
     raise Arkrb::Error::ArkManagerExecutableNotFound, 'We could not find the ark_rb binary! Please install it by running Arkrb.install.server_tools or executing the command `ark_rb install tools``' if arkmanager_exec.nil?
     arkmanager_exec
   end
@@ -21,7 +24,6 @@ module Arkrb
   # @return [Integer, String]
   def self.execute(command, command_opts = '', instance = 'main', sanitize = false)
     exec_this = format('%s %s %s @%s', executable, command.to_s.tr('_', ''), command_opts, instance)
-    pp exec_this
     stdin, stdout, stderr = Open3.popen3(exec_this)
     output = stdout.read.chomp
     errors = stderr.read.chomp
