@@ -30,7 +30,7 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_dependency 'yard', '~> 0.9.12'
-  spec.add_dependency 'oga', '~> 1.3', '>= 1.3.1'
+  spec.add_dependency 'oga', '~> 2.14'
   spec.add_runtime_dependency 'thor', '~> 0.20.0'
   spec.add_runtime_dependency 'colorize', '~> 0.8.1'
 
