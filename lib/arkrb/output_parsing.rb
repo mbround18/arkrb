@@ -176,6 +176,17 @@ module Arkrb
       output
     end
 
+    def check_update(output)
+      outputs = output.gsub(/\e\[([;\d]+)?m/, '').strip.split("\n")
+      current_version = outputs.find {|x| x =~ /Current version/im }.split(':').last.strip
+      available_version = outputs.find {|x| x =~ /Available version/im }.split(':').last.strip
+      {
+          current: current_version,
+          available: available_version,
+          update_available: current_version != available_version
+      }
+    end
+
     # @return [Boolean]
     # def update_available?(output)
     #   arkmanager_exec :check_update
