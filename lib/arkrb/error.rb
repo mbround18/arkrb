@@ -34,6 +34,9 @@ module Arkrb
     class ServerAlreadyStopped < CustomError
     end
 
+    class ServerOffline < CustomError
+    end
+
     class SanitizationUnsupportedForThisMethod < CustomError
     end
 
