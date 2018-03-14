@@ -138,26 +138,3 @@ module Arkrb
 
   end
 end
-server = Arkrb::Server.new('main')
-server.restart!
-pp server.status!
-# pp server.get_player_list
-# server.mod_list.add(731604991)
-#
-# pp server
-#
-# pp server.mod_list.to_h
-#
-#
-#
-#     mod_list = Arkrb::Mods.new
-#
-# pp mod_list
-# mod_a = 731604991
-# mod_b = 812655342
-#
-# mod_list.add(731604991)
-# mod_list.add(812655342)
-# pp mod_list.to_h
-# # mod_list.add(731604991)
-# # pp mod_list.find_by_id(mod_a).to_h
